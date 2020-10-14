@@ -1,2 +1,0 @@
-?package(textadept):needs="X11|wm" section="Applications/Applications/Editors"\
-  title="textadept" command="/usr/bin/textadept"

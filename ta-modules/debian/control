@@ -1,0 +1,63 @@
+Source: textadept-modules
+Section: unknown
+Priority: optional
+Maintainer: Pedro A. Aranda <paag@paag-Sleekbook-14>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.4
+Homepage: http://foicica.com/textadept/
+#Vcs-Git: git://git.debian.org/collab-maint/textadept-modules.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/textadept-modules.git;a=summary
+
+Package: textadept-modules-css
+Architecture: all
+Depends: ${misc:Depends},textadept-common(>=10.0)
+Description: CSS module for TextAdept
+ TextAdept extension to cope with CSS
+
+Package: textadept-modules-file-diff
+Architecture: any
+Depends: ${misc:Depends},textadept-common(>=10.0)
+Description: filediff module for TextAdept
+ TextAdept extension to cope with CSS
+
+Package: textadept-modules-html
+Architecture: all
+Depends: ${misc:Depends},textadept-common(>=10.0)
+Description: HTML module for TextAdept
+ TextAdept extension to cope with HTML
+
+# Package: textadept-modules-markdown
+# Architecture: all
+# Depends: ${misc:Depends}, textadept-common(>=10.0)
+# Description: MARKDOWN module for TextAdept
+#  TextAdept extension to cope with MARKDOWN files
+
+Package: textadept-modules-python
+Architecture: all
+Depends: ${misc:Depends},textadept-common(>=10.0)
+Description: Python language module for TextAdept
+ TextAdept extension to cope with Python
+
+Package: textadept-modules-rest
+Architecture: all
+Depends: ${misc:Depends},textadept-common(>=10.0)
+Description: REST module for TextAdept
+ TextAdept extension to cope with REST interfaces
+
+Package: textadept-modules-ruby
+Architecture: all
+Depends: ${misc:Depends},textadept-common(>=10.0)
+Description: Ruby language module for TextAdept
+ TextAdept extension to cope with Ruby
+
+Package: textadept-modules-yaml
+Architecture: any
+Depends: ${misc:Depends}, textadept-common(>=10.0)
+Description: YAML module for TextAdept
+ TextAdept extension to cope with YAML files
+
+# Package: textadept-modules-yang
+# Architecture: all
+# Depends: ${misc:Depends}, textadept-common(>=10.0)
+# Description: YANG module for TextAdept
+#  TextAdept extension to cope with YANG files

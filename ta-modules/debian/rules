@@ -1,0 +1,50 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+%:
+	dh $@
+
+# IS64=$(findstring 64, $(findstring amd64,$(shell dpkg-architecture -q DEB_TARGET_ARCH)))
+IS64=
+
+insm_%:	| %
+	install -d $(PWD)/debian/textadept-modules-$|/usr/share/textadept/modules/$|
+	install $|/* $(PWD)/debian/textadept-modules-$|/usr/share/textadept/modules/$|
+
+insi_%:	| %
+	install -d $(PWD)/debian/textadept-modules-$|/usr/share/textadept/modules/$|
+	install $|/init.lua $(PWD)/debian/textadept-modules-$|/usr/share/textadept/modules/$|
+
+insl_%:	| %
+	$(MAKE) DESTDIR=$(PWD)/debian/textadept-modules-$| PREFIX=/usr -C $| install
+
+# ins_%:	| %
+# 	$(MAKE) DESTDIR=$(PWD)/debian/textadept-modules-$| PREFIX=/usr -C $|/src install
+
+ins_yaml:
+	install -o root -g root -m 0755 -d $(PWD)/debian/textadept-modules-yaml/usr/share/textadept/modules/yaml/lyaml
+	cd yaml; install -o root -g root -m 0755 -t $(PWD)/debian/textadept-modules-yaml/usr/share/textadept/modules/yaml yaml.so *.lua
+	cd yaml/lyaml; install -o root -g root -m 0755 -t $(PWD)/debian/textadept-modules-yaml/usr/share/textadept/modules/yaml/lyaml *.lua
+# 	rm -vf $(PWD)/debian/textadept-modules-yaml/usr/share/textadept/modules/yaml/libyaml.so
+
+ins_diff:
+	install -o root -g root -m 0755 -d $(PWD)/debian/textadept-modules-file-diff/usr/share/textadept/modules/file-diff
+	cd file-diff; install -o root -g root -m 0755 -t $(PWD)/debian/textadept-modules-file-diff/usr/share/textadept/modules/file-diff diff.so init.lua README.md LICENSE
+
+override_dh_auto_build:
+	$(MAKE) ta_src=$(PWD)/../textadept/src -C yaml deps yaml.so
+	$(MAKE) ta=$(PWD)/../textadept -C file-diff clean deps diff.so
+
+
+override_dh_installdirs:
+	@-echo "Done"
+
+override_dh_auto_install:\
+	insm_css insm_html insm_python insm_ruby insm_rest ins_yaml ins_diff # insi_markdown insl_yang
+
+override_dh_auto_clean:
+	$(MAKE) -C yaml clean
+	$(MAKE) -C file-diff clean

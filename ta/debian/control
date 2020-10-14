@@ -1,0 +1,35 @@
+Source: textadept
+Section: Editors
+Priority: extra
+Maintainer: Pedro A. Aranda <paaguti@paag-Sleekbook-14.local>
+Build-Depends: debhelper (>= 8.0.0), libtgkmm-3.0 (>=3), ncursesw (>=6)
+Standards-Version: 3.9.4
+Homepage: http://foicica.com/textadept/
+#Vcs-Git: git://git.debian.org/collab-maint/textadept.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/textadept.git;a=summary
+
+Package: textadept-common
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: A fast, minimalist, and remarkably extensible cross-platform text editor
+	The user interface in TextAdept is sleek and simple. Relentlessly optimized
+	for speed and minimalism over the years, the editor consists of less than
+	2000 lines of C code and less than 4000 lines of Lua code.
+	This is the curses version
+
+# Package: textadept-nox
+# Architecture: any
+# Depends: textadept-common(>=10), ${shlibs:Depends}, ${misc:Depends}
+# Description: A fast, minimalist, and remarkably extensible cross-platform text editor
+# 	The user interface in TextAdept is sleek and simple. Relentlessly optimized
+# 	for speed and minimalism over the years, the editor consists of less than
+# 	2000 lines of C code and less than 4000 lines of Lua code.
+# 	This is the curses version
+
+Package: textadept-gtk
+Architecture: any
+Depends: textadept-common(>=10), ${shlibs:Depends}, ${misc:Depends}
+Description: A fast, minimalist, and remarkably extensible cross-platform text editor
+	The user interface in TextAdept is sleek and simple. Relentlessly optimized
+	for speed and minimalism over the years, the editor consists of less than
+	2000 lines of C code and less than 4000 lines of Lua code.

@@ -7,9 +7,9 @@ This is the basic infrastructure I use to create the packages for Ubuntu
 
 Source creates three packages for Textadept
   1. gtk
-  2. nox  (== curses)
-  3. common (all the Lua base)
+  2. common (all the Lua base)
+  # 3. nox  (== curses)
  
  And the different 'supported' modules provided by Mitchell
 
-The three .sh update the trees from merculrial and set the version names accordingly
+20201014: ported to the new orbitalquarks github repos 
