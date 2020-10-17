@@ -117,11 +117,10 @@ for mod in css file-diff html python rest ruby yaml # markdown yang
 do
 	docker exec build-z bash -c "cd /root/textadept_modules; git clone https://github.com/orbitalquark/textadept-$mod $mod"
 done
-docker exec build-z bash -c "$(apt_install debhelper debmake autotools-dev fakeroot)"
+docker exec build-z bash -c "$(apt_install gawk sed debhelper debmake autotools-dev fakeroot)"
 docker exec build-z bash -c "$(apt_install libgtkmm-${GTKVERSION}-dev libncurses-dev)"
 
 cd ta
-sed -iE "s/libgtkmm-.../libtgkmm-${GTKVERSION}/g" debian/control
 edit_sed debian/changelog "$TAVERSION"
 cat debian/control
 tar -cvf /tmp/ta-debian.tar debian
@@ -135,6 +134,11 @@ docker cp /tmp/tam-debian.tar build-z:/root/textadept_modules
 cd ..
 
 docker exec build-z bash -c "cd /root/textadept; tar -xvf ta-debian.tar"
+# get the package version of the gtkmm library
+GTKMM=$(docker exec build-z bash -c "apt list | awk -F/ '/^libgtkmm-[^-]*-[^d].*installed/{print \$1}'")
+# make sure it is in debian/control
+echo  "cd /root/textadept; sed -r -i \"s/libgtkmm-^[,]*,/${GTKMM},/g\" debian/control"
+docker exec build-z bash -c "cd /root/textadept; sed -r -i \"s/libgtkmm-^[,]*,/${GTKMM},/g\" debian/control"
 docker exec build-z bash -c "cd /root/textadept; fakeroot debian/rules ${GTK3} clean binary"
 get_debs
 #
