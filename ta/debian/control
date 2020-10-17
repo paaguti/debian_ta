@@ -28,7 +28,7 @@ Description: A fast, minimalist, and remarkably extensible cross-platform text e
 
 Package: textadept-gtk
 Architecture: any
-Depends: textadept-common(>=10), libtgkmm-2.4-1v5, ${shlibs:Depends}, ${misc:Depends}
+Depends: textadept-common(>=10), libgtkmm-3.0-1v5, ${shlibs:Depends}, ${misc:Depends}
 Description: A fast, minimalist, and remarkably extensible cross-platform text editor
 	The user interface in TextAdept is sleek and simple. Relentlessly optimized
 	for speed and minimalism over the years, the editor consists of less than
