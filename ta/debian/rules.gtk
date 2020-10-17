@@ -13,17 +13,27 @@
 	dh $@
 
 override_dh_auto_clean:
-	make PREFIX=/usr -C src clean clean.deps
-	#rm -vf src/*.zip src/*.tgz src/*.tar.gz
+	make PREFIX=/usr -C src clean
+	make -C src clean-deps
+	-rm -vf src/*.zip src/*.tgz src/*.tar.gz src/*.rock
 
 override_dh_auto_install:
-	#
-	# The common part is not compiled (Lua, text, etc.)
-	#
-	make PREFIX=/usr -C src deps NIGHTLY=1
+#
+# The common part is not compiled (Lua, text, etc.)
+#
+	make -C src deps NIGHTLY=1
 	make PREFIX=/usr DESTDIR=$(shell pwd)/debian/textadept-common -f debian/deb-install.mak install-common
-	#
-	# Create the GTK version and install the binary only
-	#
-	make GTK3=1 PREFIX=/usr -C src clean textadept
-	make PREFIX=/usr DESTDIR=$(shell pwd)/debian/textadept -f debian/deb-install.mak install-gtk
+#
+# Create the GTK version and install the binary only
+#
+ifdef GTK3
+	make PREFIX=/usr GTK3=1 -C src textadept
+else
+	make PREFIX=/usr -C src textadept
+endif
+	make PREFIX=/usr DESTDIR=$(shell pwd)/debian/textadept-gtk -f debian/deb-install.mak install-gtk
+#
+# Create the textadept-curses version and install the binary only
+#
+# make PREFIX=/usr -e -C src clean textadept-curses
+# make PREFIX=/usr DESTDIR=$(shell pwd)/debian/textadept-nox -f debian/deb-install.mak install-nox

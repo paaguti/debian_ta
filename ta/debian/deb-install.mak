@@ -25,7 +25,7 @@ install-gtk: textadept
 	cd $(DESTDIR)$(bin_dir); ln -sf $(data_dir)/$^
 	$(INSTALL) -m 0644 src/$^.desktop $(DESTDIR)$(XDG_DATA_DIR)
 
-install-nox: textadept-curses |
+install-curses: textadept-curses |
 	$(INSTALL) -m 0755 -d $(DESTDIR)$(bin_dir) $(DESTDIR)$(data_dir) $(DESTDIR)$(XDG_DATA_DIR)
 	$(INSTALL) -m 0755 $^ $(DESTDIR)$(data_dir)
 	cd $(DESTDIR)$(bin_dir); ln -sf $(data_dir)/$^

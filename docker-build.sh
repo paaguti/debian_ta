@@ -42,6 +42,7 @@ while getopts ":hv:r:2" opt; do
       ;;
     2)
       unset GTK3
+      GTKVERSION="2.4"
       ;;
     h|\?)
       usage ubuntu ${RELEASE} ${TAVERSION}
@@ -53,7 +54,6 @@ shift $((OPTIND-1))
 
 DISTRO=${1:-ubuntu}
 IMAGE=${DISTRO}:${RELEASE}
-[ -z "${GTK3}" ] && GTKVERSION="2.4"
 
 #
 # Debian docker images with -slim avoid many unnecesary dependencies and files
@@ -112,19 +112,15 @@ docker exec build-z bash -c "$(apt_install git wget)"
 # TODO: clone by TextAdept release
 #
 docker exec build-z bash -c "cd /root; git clone https://github.com/orbitalquark/textadept"
-# docker exec build-z bash -c "cd /root; git clone https://github.com/orbitalquark/textadept-modules textadept_modules"
 docker exec build-z bash -c "cd /root; mkdir textadept_modules"
 for mod in css file-diff html python rest ruby yaml # markdown yang
 do
 	docker exec build-z bash -c "cd /root/textadept_modules; git clone https://github.com/orbitalquark/textadept-$mod $mod"
 done
-#apt_install debhelper debmake autotools-dev fakeroot
 docker exec build-z bash -c "$(apt_install debhelper debmake autotools-dev fakeroot)"
 docker exec build-z bash -c "$(apt_install libgtkmm-${GTKVERSION}-dev libncurses-dev)"
 
 cd ta
-#[ -z "${GTK3}"] || sed -iE 's/libgtkmm-.../libgtkmm-3.0/g' debian/control
-#[ -z "${GTK3}"] && sed -iE 's/libgtkmm-.../libgtkmm-2.4/g' debian/control
 sed -iE "s/libgtkmm-.../libtgkmm-${GTKVERSION}/g" debian/control
 edit_sed debian/changelog "$TAVERSION"
 cat debian/control
@@ -139,16 +135,12 @@ docker cp /tmp/tam-debian.tar build-z:/root/textadept_modules
 cd ..
 
 docker exec build-z bash -c "cd /root/textadept; tar -xvf ta-debian.tar"
-# docker cp textadept-mono.diff build-z:/root/textadept
-# docker exec build-z bash -c "cd /root/textadept; patch -p1 < textadept-mono.diff"
 docker exec build-z bash -c "cd /root/textadept; fakeroot debian/rules ${GTK3} clean binary"
 get_debs
 #
-# Get the Debian infrastructure for the modules
-# Patch the Makefiles for filediff and yaml
-# Create the module packages
+# Get the Debian infrastructure for the modules and
+# create the module packages
 #
 docker exec build-z bash -c "cd /root/textadept_modules; tar -xvf tam-debian.tar"
-docker exec build-z bash -c "cd /root/textadept_modules; ls -lR"
 docker exec build-z bash -c "cd /root/textadept_modules; fakeroot debian/rules clean binary"
 get_debs

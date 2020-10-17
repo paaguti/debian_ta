@@ -21,15 +21,19 @@ override_dh_auto_install:
 	#
 	# The common part is not compiled (Lua, text, etc.)
 	#
-	make -C src deps
+	make -C src deps NIGHTLY=1
 	make PREFIX=/usr DESTDIR=$(shell pwd)/debian/textadept-common -f debian/deb-install.mak install-common
 	#
 	# Create the GTK version and install the binary only
 	#
-	make GTK3=1 PREFIX=/usr -C src clean textadept
-	make PREFIX=/usr DESTDIR=$(shell pwd)/debian/textadept-gtk -f debian/deb-install.mak install-gtk
+ifdef GTK3
+	make GTK3=1 PREFIX=/usr -C src textadept
+else
+	make PREFIX=/usr -C src textadept
+endif
+	make PREFIX=/usr DESTDIR=$(shell pwd)/debian/textadept -f debian/deb-install.mak install-gtk
 	#
 	# Create the textadept-curses version and install the binary only
 	#
-	# make GTK3=1 PREFIX=/usr -C src clean textadept-curses
-	# make PREFIX=/usr DESTDIR=$(shell pwd)/debian/textadept-nox -f debian/deb-install.mak install-nox
+	make PREFIX=/usr -C src textadept-curses
+	make PREFIX=/usr DESTDIR=$(shell pwd)/debian/textadept-curses -f debian/deb-install.mak install-curses
