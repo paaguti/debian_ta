@@ -8,10 +8,13 @@ This is the basic infrastructure I use to create the packages for Ubuntu
 Source creates three packages for Textadept
   1. gtk
   2. common (all the Lua base)
-  
-  WIP -- 3. nox  (== curses)
+  3. nox  (== curses)
  
  And the different 'supported' modules provided by Mitchell
 
-20201014: ported to the new orbitalquarks github repos. Building textadept-curses is *broken*
+CHANGELOG:
 
+20201014: ported to the new orbitalquarks github repos.
+          Building textadept-curses is *broken*
+20201017: fixed building textadept-curses
+          TODO: edit debian/changelog inside docker
