@@ -17,12 +17,11 @@ function edit_sed() {
 	#
 	# get the latest changeset from the log
 	#
-	CHGSET=`hg log -l 1 | awk -F: '/changeset/{print $2}' | awk '{$1=$1}1'`
+	# CHGSET=`hg log -l 1 | awk -F: '/changeset/{print $2}' | awk '{$1=$1}1'`
 	#
 	# Edit the changelog
 	#
 	sed -i -E "/^textadept/s/[0-9]+\.[0-9a-z.-]+/$2/
-/Update /s/[0-9]+$/$CHGSET/
 /^ --/s/>  [A-Z].*$/>  $(LC_ALL=C date '+%a, %d %b %Y %H:%m:%S %z')/" $1
 }
 
@@ -120,31 +119,65 @@ done
 docker exec build-z bash -c "$(apt_install gawk sed debhelper debmake autotools-dev fakeroot)"
 docker exec build-z bash -c "$(apt_install libgtkmm-${GTKVERSION}-dev libncurses-dev)"
 
+
 cd ta
-edit_sed debian/changelog "$TAVERSION"
-cat debian/control
-tar -cvf /tmp/ta-debian.tar debian
+# edit_sed debian/changelog "$TAVERSION"
+# cat debian/control
+tar -cf /tmp/ta-debian.tar debian
 echo "Copying the debian infrastructure to the container..."
 docker cp /tmp/ta-debian.tar build-z:/root/textadept
 cd ../ta-modules
-edit_sed debian/changelog "$TAVERSION"
-tar -cvf /tmp/tam-debian.tar debian
-echo "Copying the debian infrastructure to the container..."
+# edit_sed debian/changelog "$TAVERSION"
+tar -cf /tmp/tam-debian.tar debian
+echo "Copying the debian infrastructure for the modules to the container..."
 docker cp /tmp/tam-debian.tar build-z:/root/textadept_modules
 cd ..
 
-docker exec build-z bash -c "cd /root/textadept; tar -xvf ta-debian.tar"
+for d in textadept textadept_modules
+do
+	echo "In /root/$d"
+	docker exec build-z bash -c "cd /root/$d; tar -xvf ta*.tar"
+done
+printf "\n\n"
+#
+# Set the version, commit and timestamp in the changelogs
+#
+COMMIT=$(docker exec build-z bash -c "cd /root/textadept; git log | head -1 | awk '{printf(\"%s\n\",substr(\$2,1,8))}'")
+NOW=$(LC_ALL=C date '+%a, %d %b %Y %H:%m:%S %z')
+echo "COMMIT=$COMMIT"
+echo "NOW=$NOW"
+echo "TAVERSION=$TAVERSION"
+for d in textadept textadept_modules
+do
+	# Set the version
+	docker exec build-z bash -c "cd /root/$d; sed -r -i \"/^textadept/s/[0-9].[0-9a-z.-]+/$TAVERSION/g\" debian/changelog"
+	# set the comment to the short commit
+	docker exec build-z bash -c "cd /root/$d; sed -r -i \"/Update /s/[0-9]+\$/$COMMIT/g\" debian/changelog"
+	# Set the timestamp in the changelogs
+	docker exec build-z bash -c "cd /root/$d; sed -r -i \"/^ --/s/>  [A-Z].*\$/>  $NOW/g\" debian/changelog"
+done
+
+# fix debian/control for textadept
 # get the package version of the gtkmm library
 GTKMM=$(docker exec build-z bash -c "apt list | awk -F/ '/^libgtkmm-[^-]*-[^d].*installed/{print \$1}'")
 # make sure it is in debian/control
-echo  "cd /root/textadept; sed -r -i \"s/libgtkmm-^[,]*,/${GTKMM},/g\" debian/control"
-docker exec build-z bash -c "cd /root/textadept; sed -r -i \"s/libgtkmm-^[,]*,/${GTKMM},/g\" debian/control"
-docker exec build-z bash -c "cd /root/textadept; fakeroot debian/rules ${GTK3} clean binary"
-get_debs
+echo  "cd /root/textadept; sed -r -i \"s/libgtkmm-[^,]*,/${GTKMM},/g\" debian/control"
+docker exec build-z bash -c "cd /root/textadept; sed -r -i \"s/libgtkmm-[^,]*,/${GTKMM},/g\" debian/control"
 #
-# Get the Debian infrastructure for the modules and
+# For debugging purposes
+#
+for d in textadept textadept_modules
+do
+	printf "\n%s/debian/changelog:\n\n" $d
+	docker exec build-z bash -c "cat /root/$d/debian/changelog"
+	printf "\n%s/debian/control:\n\n" $d
+	docker exec build-z bash -c "cat /root/$d/debian/control"
+done
+#
 # create the module packages
 #
-docker exec build-z bash -c "cd /root/textadept_modules; tar -xvf tam-debian.tar"
-docker exec build-z bash -c "cd /root/textadept_modules; fakeroot debian/rules clean binary"
+for d in textadept textadept_modules
+do
+	docker exec build-z bash -c "cd /root/$d; fakeroot debian/rules ${GTK3} clean binary"
+done
 get_debs
