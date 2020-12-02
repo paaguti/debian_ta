@@ -31,8 +31,8 @@ ins_yaml:
 # 	rm -vf $(PWD)/debian/textadept-modules-yaml/usr/share/textadept/modules/yaml/libyaml.so
 
 ins_diff:
-	install -o root -g root -m 0755 -d $(PWD)/debian/textadept-modules-file-diff/usr/share/textadept/modules/file-diff
-	cd file-diff; install -o root -g root -m 0755 -t $(PWD)/debian/textadept-modules-file-diff/usr/share/textadept/modules/file-diff diff.so init.lua README.md LICENSE
+	install -o root -g root -m 0755 -d $(PWD)/debian/textadept-modules-file-diff/usr/share/textadept/modules/file_diff
+	cd file-diff; install -o root -g root -m 0755 -t $(PWD)/debian/textadept-modules-file-diff/usr/share/textadept/modules/file_diff diff.so init.lua README.md LICENSE
 
 override_dh_auto_build:
 	$(MAKE) ta_src=$(PWD)/../textadept/src -C yaml deps yaml.so

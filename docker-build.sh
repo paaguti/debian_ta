@@ -26,12 +26,13 @@ function edit_sed() {
 }
 
 DISTRO=ubuntu
-TAVERSION=11.0alpha3-1
+TAVERSION=11.0
 RELEASE=20.04
 GTKVERSION="3.0"
 GTK3="GTK3=1"
+KEEP=0
 
-while getopts ":hv:r:2" opt; do
+while getopts ":hv:r:2k" opt; do
   case $opt in
     r)
       RELEASE=${OPTARG}
@@ -42,6 +43,9 @@ while getopts ":hv:r:2" opt; do
     2)
       unset GTK3
       GTKVERSION="2.4"
+      ;;
+    k)
+      KEEP=1
       ;;
     h|\?)
       usage ubuntu ${RELEASE} ${TAVERSION}
@@ -60,7 +64,9 @@ IMAGE=${DISTRO}:${RELEASE}
 #IMAGE=$(echo ${DISTRO}${RELEASE} | sed 's/-slim//g')/libgtkmm-${GTKVERSION}:latest
 DEBDIR=$(echo ${DISTRO}-${RELEASE} | sed 's/-slim//g')
 
-[ -d  ${DEBDIR} ] && rm -vf ${DEBDIR}/textadept*${TAVERSION}*.deb
+if [ $KEEP -ne 1 ]; then
+  [ -d  ${DEBDIR} ] && rm -vf ${DEBDIR}/textadept*${TAVERSION}*.deb
+fi
 [ -d  ${DEBDIR} ] || mkdir -v ${DEBDIR}
 
 function cleanup () {
@@ -105,8 +111,13 @@ docker run -it -d --name build-z ${IMAGE} bash
 # get the development libraries
 #
 docker exec build-z bash -c "DEBIAN_FRONTEND=noninteractive apt-get update"
-docker exec build-z bash -c "DEBIAN_FRONTEND=noninteractive apt-get upgrade -y"
+#
+# Update only what is strictly necessary
+#
+# docker exec build-z bash -c "DEBIAN_FRONTEND=noninteractive apt-get upgrade -y"
 docker exec build-z bash -c "$(apt_install git wget)"
+docker exec build-z bash -c "$(apt_install gawk sed debhelper debmake autotools-dev fakeroot)"
+docker exec build-z bash -c "$(apt_install libgtkmm-${GTKVERSION}-dev libncurses-dev)"
 #
 # TODO: clone by TextAdept release
 #
@@ -116,8 +127,6 @@ for mod in css file-diff html python rest ruby yaml # markdown yang
 do
 	docker exec build-z bash -c "cd /root/textadept_modules; git clone https://github.com/orbitalquark/textadept-$mod $mod"
 done
-docker exec build-z bash -c "$(apt_install gawk sed debhelper debmake autotools-dev fakeroot)"
-docker exec build-z bash -c "$(apt_install libgtkmm-${GTKVERSION}-dev libncurses-dev)"
 
 
 cd ta
