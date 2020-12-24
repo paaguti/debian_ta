@@ -1,6 +1,7 @@
 #!/bin/bash
 set -eE
 
+
 function usage () {
   printf "%s: build Textadept and some modules\nUsage:\n" $(basename $0)
   printf " %s [-v TAVERSION] [-r RELEASE] [-2] [distro]\n\n" $(basename $0)
@@ -55,7 +56,13 @@ while getopts ":hv:r:2k" opt; do
 done
 shift $((OPTIND-1))
 
+rm -vf docker-build.log
+
 DISTRO=${1:-ubuntu}
+#
+# if debian, make sure to choose the -slim image for the release
+#
+[ "${DISTRO}" == "debian" ] && RELEASE=$(echo "$RELEASE" | awk '{ gsub (/-slim$/,""); printf("%s-slim", $0);}')
 IMAGE=${DISTRO}:${RELEASE}
 
 #

@@ -4,7 +4,8 @@ function edit_sed() {
 	#
 	# get the latest changeset from the log
 	#
-	CHGSET=`hg log -l 1 | awk -F: '/changeset/{print $2}' | awk '{$1=$1}1'`
+# 	CHGSET=`git log 1 | awk -F: '/changeset/{print $2}' | awk '{$1=$1}1'`
+	CHGSET=`git log -1 | awk '/^commit/ {print $2}'`
 	#
 	# Edit the changelog
 	#
@@ -21,12 +22,12 @@ OK=$(echo "$1" | grep -E '[0-9]+\.[0-9a-z.-]+'| wc -l)
 VERSION="$1"
 cd textadept
 fakeroot debian/rules clean
-hg pull -u
+git pull
 edit_sed debian/changelog "$VERSION"
 fakeroot debian/rules clean binary
 cd ../textadept_modules
 fakeroot debian/rules clean
-hg pull -u
+git pull
 edit_sed debian/changelog "$VERSION"
 fakeroot debian/rules clean binary
 cd ..
