@@ -1,5 +1,9 @@
 #!/bin/bash
 
+function version_sed() {
+  echo "$(basename $0) <version> - <version> like 10.8-1"
+  awk '/^textad/ { gsub(/[()]/,""); printf("debian/changelog suggests version %s\n", $2)}' $(dirname $0)/ta/debian/changelog
+}
 function edit_sed() {
   #
   # get the latest changeset from the log
@@ -14,10 +18,10 @@ function edit_sed() {
 /^ --/s/>  [A-Z].*$/>  `LC_ALL=C date '+%a, %d %b %Y %H:%m:%S %z'`/" $1
 }
 
-[ $# -eq 1 ] || echo "$(basename $0) <version> version like 10.8-1"
+[ $# -eq 1 ] || version_sed
 [ $# -eq 1 ] || exit
 OK=$(echo "$1" | grep -E '[0-9]+\.[0-9a-z.-]+'| wc -l)
-[ $OK -eq 1 ]  || echo "$(basename $0) <version> version like 10.8-1"
+[ $OK -eq 1 ]  || version_sed
 [ $OK -eq 1 ]  || exit
 VERSION="$1"
 cd textadept
