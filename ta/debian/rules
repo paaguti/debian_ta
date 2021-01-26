@@ -25,8 +25,9 @@ override_dh_auto_install:
 	make PREFIX=/usr DESTDIR=$(shell pwd)/debian/textadept-common -f debian/deb-install.mak install-common
 	#
 	# Create the GTK version and install the binary only
+	# By default create GTK3, except if you define GTK2=1 in the cmd line
 	#
-ifdef GTK3
+ifndef GTK2
 	make GTK3=1 PREFIX=/usr -C src textadept
 else
 	make PREFIX=/usr -C src textadept
